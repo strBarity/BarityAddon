@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public class LobbyHotbarListener extends LobbyHotbar implements Listener {
     @EventHandler
     public void onInventoryClick(@NotNull InventoryClickEvent e) {
-        if (e.getView().getTitle().equals("§8게임 시작 전 핫바 설정")) {
+        if (e.getView().getTitle().equals(INV_TITLE)) {
             if (e.getRawSlot() >= 18 && e.getRawSlot() <= 26) {
                 update(e);
                 Bukkit.getOnlinePlayers().forEach(this::updateHotbar);
@@ -25,8 +25,8 @@ public class LobbyHotbarListener extends LobbyHotbar implements Listener {
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent e) {
-        if (e.getView().getTitle().equals("§8게임 시작 전 핫바 설정")) {
+    public void onInventoryClose(@NotNull InventoryCloseEvent e) {
+        if (e.getView().getTitle().equals(INV_TITLE)) {
             for (int i = 0; i < 9; i++) {
                 config.set(DEFAULTPATH + i, e.getInventory().getItem(i +  18));
             }

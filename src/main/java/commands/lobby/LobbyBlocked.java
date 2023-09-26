@@ -9,14 +9,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class LobbyBlocked extends Command implements Listener {
+public class LobbyBlocked extends Command {
     private enum BlockedActions {
         LCLICK(Material.DIAMOND_PICKAXE, "§c좌클릭", Arrays.asList("§7모든 좌클릭을 금지합니다.", "§7이 행동에는 블럭 파괴가 포함됩니다.")),
         RCLICK(Material.WORKBENCH, "§b우클릭", Arrays.asList("§7모든 우클릭을 금지합니다.", "§7이 행동에는 블럭 설치가 포함됩니다.")),
@@ -26,8 +27,8 @@ public class LobbyBlocked extends Command implements Listener {
         DAMAGE(Material.REDSTONE, "§4피격", Arrays.asList("§7피해를 입는 모든 행위를 금지합니다.", "§e체력이 최대 체력으로 고정되는 설정도 포함됩니다.")),
         EAT_FOOD(Material.COOKIE, "§5음식 섭취", Arrays.asList("§7음식을 먹는 행위를 금지합니다.", "§7장식용 아이템을 먹어서 없애지 못하게 합니다.")),
         HUNGER(Material.ROTTEN_FLESH, "§2허기", Arrays.asList("§7배고픔 게이지가 감소하지 않게 합니다.", "§7기다리다 배고파서 쓰러지는 플레이어를 방지합니다.")),
-        INV_CLICK(Material.CHEST, "§9인벤토리 클릭", Arrays.asList("§7인벤토리 아이템을 클릭하지 못하게 합니다.", "§e핫바를 설정했다면 이 설정도 키는게 좋습니다.")),
-        VOID(Material.BEDROCK, "§8공허", Arrays.asList("§7맵을 탈출해 공허로 무한히 떨어지는걸 방지합니다.", "§7y=0 미만으로 내려갈 시 스폰 약간 반대 방향으로 위로 튀어오른 후", "그대로 스폰 쪽으로 날아가게 합니다."));
+        INV_CLICK(Material.STICK, "§9인벤토리 클릭", Arrays.asList("§7인벤토리 아이템을 클릭하지 못하게 합니다.", "§e핫바를 설정했다면 이 설정도 키는게 좋습니다.")),
+        VOID(Material.BEDROCK, "§8공허", Arrays.asList("§7맵을 탈출해 공허로 무한히 떨어지는걸 방지합니다.", "§7y=0 미만으로 내려갈 시 스폰 약간 반대 방향으로 위로 튀어오른 후", "§7그대로 스폰 쪽으로 날아가게 합니다."));
         private final Material icon;
         private final String name;
         private final List<String> lore;
@@ -40,11 +41,14 @@ public class LobbyBlocked extends Command implements Listener {
     }
     protected AddonConfig config;
     protected static final String DEFAULTPATH = "blockedActions.";
+    protected static final int INV_SIZE = 45;
+    protected static final String INV_TITLE = "§8게임 시작 전 금지 행동 설정";
+    protected static final String ONLY_IN_LOBBY = DEFAULTPATH + "onlyInLobby";
     private int voidTaskId;
     private final List<BlockedActions> actionsList = Arrays.asList(BlockedActions.LCLICK, BlockedActions.RCLICK, BlockedActions.DROP_ITEM, BlockedActions.PICKUP_ITEM, BlockedActions.SWAP_HAND, BlockedActions.DAMAGE, BlockedActions.EAT_FOOD, BlockedActions.HUNGER, BlockedActions.INV_CLICK, BlockedActions.VOID);
     public LobbyBlocked() {
         super(Condition.OP);
-        config = new AddonConfig("lobbyConfig");
+        config = AddonConfig.getConfig("lobbyConfig");
         resetConfig();
     }
 
@@ -60,10 +64,11 @@ public class LobbyBlocked extends Command implements Listener {
     }
 
     protected void open(Player p) {
-        Inventory gui = Bukkit.createInventory(null, 36, "§8게임 시작 전 금지 행동 설정");
+        Inventory gui = Bukkit.createInventory(null, INV_SIZE, INV_TITLE);
         for (int i = 0; i < gui.getSize(); i++) {
             gui.setItem(i, ItemFactory.blank(ItemFactory.ItemColor.WHITE, false));
         }
+        gui.setItem(3, ItemFactory.createItem(Material.SIGN, 0, "§c금지 행동 설정", Collections.singletonList("§7게임 시작 전, 플레이어들이 금지할 설정을 설정합니다."), null, 1, true));
         applyConfig(gui);
         p.openInventory(gui);
     }
@@ -76,6 +81,9 @@ public class LobbyBlocked extends Command implements Listener {
             if (a.equals(BlockedActions.VOID) && (boolean) config.get(DEFAULTPATH + a.name())) {
                 syncVoid();
             }
+        }
+        if (config.get(ONLY_IN_LOBBY) == null) {
+            config.set(ONLY_IN_LOBBY, false);
         }
     }
 
@@ -93,8 +101,19 @@ public class LobbyBlocked extends Command implements Listener {
         Bukkit.getScheduler().cancelTask(voidTaskId);
     }
 
-    private void applyConfig(Inventory inv) {
-        int i = 9;
+    private void applyConfig(@NotNull Inventory inv) {
+        List<String> lobbyLore = new ArrayList<>();
+        lobbyLore.add("§7금지 행동이 로비 월드에서만");
+        lobbyLore.add("§7작동할 지 설정합니다.");
+        Object lobbyName = config.get("lobby");
+        if (lobbyName == null) {
+            lobbyName = "§c없음";
+        }
+        lobbyLore.add("§7현재 로비: §a" + lobbyName);
+        lobbyLore.add(" ");
+        lobbyLore.add("§e현재 설정: " + AddonConfig.boolTranslate((boolean) config.get(ONLY_IN_LOBBY)));
+        inv.setItem(5, ItemFactory.createItem(Material.GRASS, 0, "§c로비에서만 금지하기", lobbyLore, null, 1, (boolean) config.get(ONLY_IN_LOBBY)));
+        int i = 18;
         for (BlockedActions a : actionsList) {
             boolean actionConfig = (boolean) config.get(DEFAULTPATH + a.name());
             List<String> lore = new ArrayList<>(a.lore);

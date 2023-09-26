@@ -17,7 +17,7 @@ public class ItemStorage extends Command  {
     protected static final String DEFAULTPATH = "storage.";
     public ItemStorage() {
         super(Condition.OP);
-        config = new AddonConfig("itemStorage");
+        config = AddonConfig.getConfig("itemStorage");
         resetConfig();
     }
     @Override
@@ -32,7 +32,6 @@ public class ItemStorage extends Command  {
 
     @SuppressWarnings("unchecked")
     private void open(@NotNull Player p) {
-        config.reload();
         Inventory gui = Bukkit.createInventory(null, config.getConfig().getInt(DEFAULTPATH + "size"), (String) config.get(DEFAULTPATH + "title"));
         ItemStack[] content = ((List<ItemStack>) config.get(DEFAULTPATH + "content")).toArray(new ItemStack[0]);
         gui.setContents(content);

@@ -3,6 +3,7 @@ package main.java.commands.item;
 import daybreak.abilitywar.Command;
 import daybreak.abilitywar.utils.base.Messager;
 import daybreak.abilitywar.utils.base.math.NumberUtil;
+import daybreak.abilitywar.utils.library.MaterialX;
 import main.java.util.ItemFactory;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -72,8 +73,12 @@ public class ItemCrate extends Command {
         try {
             return Material.valueOf(material);
         } catch (IllegalArgumentException e) {
-            Messager.sendErrorMessage(sender, "알 수 없는 아이템 종류입니다: " + material);
-            return null;
+            try {
+                return MaterialX.valueOf(material).getMaterial();
+            } catch (IllegalArgumentException e1) {
+                Messager.sendErrorMessage(sender, "알 수 없는 아이템 종류입니다: " + material);
+                return null;
+            }
         }
     }
 

@@ -33,7 +33,6 @@ public class ItemStorageListener extends ItemStorage implements Listener {
     private void syncInventory(Inventory inventory, @NotNull HumanEntity whoClicked) {
         saveContent(inventory);
         updateContent((Player) whoClicked);
-        whoClicked.sendMessage("§aSAVE");
     }
 
     private void saveContent(@NotNull Inventory gui) {
@@ -42,7 +41,6 @@ public class ItemStorageListener extends ItemStorage implements Listener {
 
     @SuppressWarnings("unchecked")
     private void updateContent(Player originalPlayer) {
-        config.reload();
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (!p.equals(originalPlayer) && p.getOpenInventory().getTopInventory() != null && p.getOpenInventory().getTopInventory().getTitle().equals(title)) {
                 p.getOpenInventory().getTopInventory().setContents(((List<ItemStack>) config.get(DEFAULTPATH + "content")).toArray(new ItemStack[0]));

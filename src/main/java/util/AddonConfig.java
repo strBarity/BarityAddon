@@ -1,6 +1,7 @@
 package main.java.util;
 
 import daybreak.abilitywar.utils.base.Messager;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Contract;
@@ -13,7 +14,7 @@ public class AddonConfig {
     private File configFile;
     private FileConfiguration config;
     private final String fileName;
-    public AddonConfig(String fileName) {
+    private AddonConfig(String fileName) {
         this.fileName = fileName;
         loadData();
     }
@@ -21,26 +22,30 @@ public class AddonConfig {
     public void loadData() {
         configFile = new File("plugins/AbilityWar/Addon/BarityAddon/" + this.fileName + ".yml");
         config = YamlConfiguration.loadConfiguration(configFile);
-        if (!configFile.exists()) {
-            try {
+        try {
+            if (!configFile.exists()) {
                 config.save(configFile);
-                Messager.sendConsoleMessage("§a성공적으로 컨피그 파일을 생성했습니다.");
-            } catch (IOException e) {
-                Messager.sendConsoleMessage("컨피그 파일 생성 중 오류가 발생했습니다.");
             }
+        } catch (Exception e) {
+            Messager.sendConsoleMessage("컨피그 파일 로드 중 오류가 발생했습니다.");
+        }
+    }
+
+    private void reload() {
+        try {
+            config.load(configFile);
+        } catch (IOException | InvalidConfigurationException e) {
+            Messager.sendConsoleMessage("컨피그 파일 로드 중 오류가 발생했습니다.");
         }
     }
 
     public void saveData() {
         try {
             config.save(configFile);
+            reload();
         } catch (IOException e) {
             Messager.sendConsoleMessage("컨피그 파일 저장 중 오류가 발생했습니다.");
         }
-    }
-
-    public void reload() {
-        config = YamlConfiguration.loadConfiguration(configFile);
     }
 
     public FileConfiguration getConfig() {
@@ -48,6 +53,7 @@ public class AddonConfig {
     }
 
     public Object get(String path) {
+        reload();
         return config.get(path);
     }
 
@@ -65,4 +71,10 @@ public class AddonConfig {
             return "§c꺼짐";
         }
     }
+
+    @Contract("_ -> new")
+    public static @NotNull AddonConfig getConfig(String fileName) {
+        return new AddonConfig(fileName);
+    }
+
 }

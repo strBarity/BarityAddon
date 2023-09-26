@@ -30,66 +30,71 @@ public class LobbyBlockedListener extends LobbyBlocked implements Listener {
     private boolean hunger = (boolean) config.get(DEFAULTPATH + "HUNGER");
     private boolean invClick = (boolean) config.get(DEFAULTPATH + "INV_CLICK");
     private boolean voidOption = (boolean) config.get(DEFAULTPATH + "VOID");
+    private boolean onlyInLobby = (boolean) config.get(ONLY_IN_LOBBY);
 
     @EventHandler
     public void onInventoryClick(@NotNull InventoryClickEvent e) {
-        if (e.getView().getTitle().equals("§8게임 시작 전 금지 행동 설정") && e.getRawSlot() < e.getInventory().getSize()) {
+        if (e.getView().getTitle().equals(INV_TITLE) && e.getRawSlot() < e.getInventory().getSize()) {
             Player p = (Player) e.getWhoClicked();
             e.setCancelled(true);
             boolean changed = true;
-            switch (e.getRawSlot() - 8) {
-                case 1: {
+            switch (e.getRawSlot()) {
+                case 5: {
+                    config.set(ONLY_IN_LOBBY, !onlyInLobby);
+                    onlyInLobby = !onlyInLobby;
+                    break;
+                }
+                case 18: {
                     config.set(DEFAULTPATH + "LCLICK", !lClick);
                     lClick = !lClick;
                     break;
                 }
-                case 2: {
+                case 19: {
                     config.set(DEFAULTPATH + "RCLICK", !rClick);
                     rClick = !rClick;
                     break;
                 }
-                case 3: {
+                case 20: {
                     config.set(DEFAULTPATH + "DROP_ITEM", !dropItem);
                     dropItem = !dropItem;
                     break;
                 }
-                case 4: {
+                case 21: {
                     config.set(DEFAULTPATH + "PICKUP_ITEM", !pickupItem);
                     pickupItem = !pickupItem;
                     break;
                 }
-                case 5: {
+                case 22: {
                     config.set(DEFAULTPATH + "SWAP_HAND", !swapHand);
                     swapHand = !swapHand;
                     break;
                 }
-                case 6: {
+                case 23: {
                     config.set(DEFAULTPATH + "DAMAGE", !damage);
                     damage = !damage;
                     break;
                 }
-                case 7: {
+                case 24: {
                     config.set(DEFAULTPATH + "EAT_FOOD", !eatFood);
                     eatFood = !eatFood;
                     break;
                 }
-                case 8: {
+                case 25: {
                     config.set(DEFAULTPATH + "HUNGER", !hunger);
                     hunger = !hunger;
                     break;
                 }
-                case 9: {
+                case 26: {
                     config.set(DEFAULTPATH + "INV_CLICK", !invClick);
                     invClick = !invClick;
                     break;
                 }
-                case 10: {
+                case 27: {
                     config.set(DEFAULTPATH + "VOID", !voidOption);
                     voidOption = !voidOption;
                     if (voidOption) {
                         syncVoid();
-                    }
-                    else {
+                    } else {
                         stopSyncVoid();
                     }
                     break;
@@ -100,14 +105,14 @@ public class LobbyBlockedListener extends LobbyBlocked implements Listener {
             if (changed) {
                 open(p);
             }
-        } else if (!GameManager.isGameRunning() && !e.getWhoClicked().getGameMode().equals(GameMode.CREATIVE) && invClick) {
+        } else if (invClick && isMeetDefReq((Player) e.getWhoClicked())) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onClick(@NotNull PlayerInteractEvent e) {
-        if (!GameManager.isGameRunning() && !e.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+        if ((lClick || rClick) && isMeetDefReq(e.getPlayer())) {
             if ((e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) && lClick) {
                 e.setCancelled(true);
             }
@@ -119,21 +124,21 @@ public class LobbyBlockedListener extends LobbyBlocked implements Listener {
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent e) {
-        if (!GameManager.isGameRunning() && !e.getPlayer().getGameMode().equals(GameMode.CREATIVE) && dropItem) {
+        if (dropItem && isMeetDefReq(e.getPlayer())) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onSwap(PlayerSwapHandItemsEvent e) {
-        if (!GameManager.isGameRunning() && !e.getPlayer().getGameMode().equals(GameMode.CREATIVE) && swapHand) {
+        if (swapHand && isMeetDefReq(e.getPlayer())) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onDamage(EntityDamageEvent e) {
-        if (!GameManager.isGameRunning() && damage && e.getEntity() instanceof Player) {
+    public void onDamage(@NotNull EntityDamageEvent e) {
+        if (e.getEntity() instanceof Player && damage && isMeetDefReq((Player) e.getEntity())) {
             Player p = (Player) e.getEntity();
             e.setCancelled(true);
             p.setHealth(((Player) e.getEntity()).getHealthScale());
@@ -145,16 +150,32 @@ public class LobbyBlockedListener extends LobbyBlocked implements Listener {
 
     @EventHandler
     public void onEat(PlayerItemConsumeEvent e) {
-        if (!GameManager.isGameRunning() && !e.getPlayer().getGameMode().equals(GameMode.CREATIVE) && eatFood) {
+        if (eatFood && isMeetDefReq(e.getPlayer())) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onHunger(FoodLevelChangeEvent e) {
-        if (!GameManager.isGameRunning() && hunger) {
+        if (hunger && isMeetDefReq((Player) e.getEntity())) {
             e.setFoodLevel(20);
         }
+    }
+
+    private boolean isMeetDefReq(Player p) {
+        boolean isInLobby;
+        boolean onlyInLobbyV = (boolean) config.get(DEFAULTPATH + "onlyInLobby");
+        Object lobbyWorld = config.get("lobby");
+        if (onlyInLobbyV) {
+            if (lobbyWorld != null) {
+                isInLobby = p.getWorld().equals(Bukkit.getWorld(lobbyWorld.toString()));
+            } else {
+                isInLobby = false;
+            }
+        } else {
+            isInLobby = true;
+        }
+        return !GameManager.isGameRunning() && !p.getGameMode().equals(GameMode.CREATIVE) && isInLobby;
     }
 
     public static void upVoid(@NotNull Player p) {

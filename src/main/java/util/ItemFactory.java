@@ -1,5 +1,6 @@
 package main.java.util;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -8,6 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +47,11 @@ public class ItemFactory {
         ItemMeta m = i.getItemMeta();
         m.setDisplayName(name);
         if (lore != null) {
-            m.setLore(lore);
+            List<String> finalLore = new ArrayList<>();
+            for (String s : lore) {
+                finalLore.add(ChatColor.WHITE + s);
+            }
+            m.setLore(finalLore);
         }
         if (enchant != null) {
             for (Map.Entry<Enchantment, Integer> entry : enchant.entrySet()) {
