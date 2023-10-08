@@ -1,6 +1,8 @@
 package main.java.commands.gamecommand;
 
+import daybreak.abilitywar.game.GameManager;
 import daybreak.abilitywar.game.event.GameEndEvent;
+import daybreak.abilitywar.game.event.GameReadyEvent;
 import main.java.playerdata.PlayerData;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 public class GameVoteListener extends GameVote implements Listener {
     @EventHandler
     public void onClick(@NotNull PlayerInteractEvent e) {
-        if (e.getHand() != null && e.getHand().equals(EquipmentSlot.HAND) && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && e.getItem() != null && e.getItem().equals(config.get(VOTEITEM))) {
+        if (!GameManager.isGameRunning() && e.getHand() != null && e.getHand().equals(EquipmentSlot.HAND) && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && e.getItem() != null && e.getItem().equals(config.get(VOTEITEM))) {
             vote(e.getPlayer());
         }
     }
@@ -26,6 +28,11 @@ public class GameVoteListener extends GameVote implements Listener {
     public void onGameEnd(GameEndEvent e) {
         voteBar.setVisible(true);
     }
+    @EventHandler
+    public void onGameStart(GameReadyEvent e) {
+        voteBar.setVisible(false);
+    }
+
     @EventHandler
     public void onInventoryClick(@NotNull InventoryClickEvent e) {
         if (e.getView().getTitle().equals(INV_TITLE)) {

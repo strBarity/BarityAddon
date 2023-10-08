@@ -166,7 +166,10 @@ public class LobbyBlockedListener extends LobbyBlocked implements Listener {
         boolean isInLobby;
         boolean onlyInLobbyV = (boolean) config.get(DEFAULTPATH + "onlyInLobby");
         Object lobbyWorld = config.get("lobby");
-        if (onlyInLobbyV) {
+        if (GameManager.isGameRunning()) {
+            isInLobby = true;
+        }
+        else if (onlyInLobbyV) {
             if (lobbyWorld != null) {
                 isInLobby = p.getWorld().equals(Bukkit.getWorld(lobbyWorld.toString()));
             } else {
@@ -175,7 +178,7 @@ public class LobbyBlockedListener extends LobbyBlocked implements Listener {
         } else {
             isInLobby = true;
         }
-        return !GameManager.isGameRunning() && !p.getGameMode().equals(GameMode.CREATIVE) && isInLobby;
+        return (GameManager.getGame() == null || !GameManager.getGame().isGameStarted()) && !p.getGameMode().equals(GameMode.CREATIVE) && isInLobby;
     }
 
     public static void upVoid(@NotNull Player p) {

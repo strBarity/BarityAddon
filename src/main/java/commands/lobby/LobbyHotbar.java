@@ -3,6 +3,7 @@ package main.java.commands.lobby;
 import daybreak.abilitywar.Command;
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.util.AddonConfig;
+import main.java.util.ItemColor;
 import main.java.util.ItemFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -15,7 +16,7 @@ import java.util.Arrays;
 
 public class LobbyHotbar extends Command {
 
-    protected AddonConfig config;
+    protected final AddonConfig config;
     protected static final int INV_SIZE = 36;
     protected static final String INV_TITLE = "§8게임 시작 전 핫바 설정";
     protected static final String DEFAULTPATH = "hotbarItems.";
@@ -39,7 +40,7 @@ public class LobbyHotbar extends Command {
     protected void open(Player p) {
         Inventory gui = Bukkit.createInventory(null, INV_SIZE, INV_TITLE);
         for (int i = 0; i < gui.getSize(); i++) {
-            gui.setItem(i, ItemFactory.blank(ItemFactory.ItemColor.LIGHT_BLUE, false));
+            gui.setItem(i, ItemFactory.blank(ItemColor.LIGHT_BLUE, false));
         }
         gui.setItem(4, hotbarSign);
         applyConfig(gui);

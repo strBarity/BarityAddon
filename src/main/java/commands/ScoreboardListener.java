@@ -1,4 +1,4 @@
-package main.java.commands.lobby;
+package main.java.commands;
 
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.playerdata.PlayerData;
@@ -13,7 +13,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class LobbyScoreboardListener extends LobbyScoreboard implements Listener {
+public class ScoreboardListener extends ScoreboardHandler implements Listener {
+    private static final String DEFAULTPATH = "scoreboard.";
     private enum lineEditType {
         UP(1),
         DOWN(-1);
@@ -23,13 +24,23 @@ public class LobbyScoreboardListener extends LobbyScoreboard implements Listener
         }}
     @EventHandler
     public void onInventoryClick(@NotNull InventoryClickEvent e) {
-        if (e.getView().getTitle().equals(INV_TITLE)) {
+        String title = e.getView().getTitle();
+        if (title.equals(ScoreboardPage.LOBBY.getInvTitle())) {
             e.setCancelled(true);
             if (e.getRawSlot() == 51) {
-                newLine((Player) e.getWhoClicked());
+                newLine((Player) e.getWhoClicked(), ScoreboardPage.LOBBY);
             }
             if (e.getCurrentItem() != null && e.getCurrentItem().getType().equals(Material.SIGN)) {
-                compareAction((Player) e.getWhoClicked(), e.getClick(), e.getRawSlot());
+                compareAction((Player) e.getWhoClicked(), ScoreboardPage.LOBBY, e.getClick(), e.getRawSlot());
+            }
+        }
+        else if (title.equals(ScoreboardPage.GAME.getInvTitle())) {
+            e.setCancelled(true);
+            if (e.getRawSlot() == 51) {
+                newLine((Player) e.getWhoClicked(), ScoreboardPage.GAME);
+            }
+            if (e.getCurrentItem() != null && e.getCurrentItem().getType().equals(Material.SIGN)) {
+                compareAction((Player) e.getWhoClicked(), ScoreboardPage.GAME, e.getClick(), e.getRawSlot());
             }
         }
     }
@@ -37,7 +48,7 @@ public class LobbyScoreboardListener extends LobbyScoreboard implements Listener
     @EventHandler
     public void onChat(@NotNull AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
-        if (PlayerData.getData(p).isInScoreboardEdit()) {
+        if (PlayerData.getData(p).isInLobbyScoreboardEdit() || PlayerData.getData(p).isInGameScoreboardEdit()) {
             e.setCancelled(true);
             if (e.getMessage().length() > 40) {
                 Messager.sendErrorMessage(p, "스코어보드 내용은 40글자를 초과할 수 없습니다.");
@@ -45,17 +56,24 @@ public class LobbyScoreboardListener extends LobbyScoreboard implements Listener
             else {
                 String s = ChatColor.translateAlternateColorCodes('&', e.getMessage());
                 int i = PlayerData.getData(p).getEditingScoreboardId();
-                setLine(i, s);
+                if (PlayerData.getData(p).isInLobbyScoreboardEdit()) {
+                    setLine(ScoreboardPage.LOBBY, i, s);
+                    open(p, ScoreboardPage.LOBBY);
+                }
+                else if (PlayerData.getData(p).isInGameScoreboardEdit()) {
+                    setLine(ScoreboardPage.GAME, i, s);
+                    open(p, ScoreboardPage.GAME);
+                }
                 p.sendMessage("§a성공적으로 §e" + i + "§a번째 스코어보드 내용을 §f\"" + s + "§f\"§a(으)로 변경했습니다.");
-                open(p);
             }
-            PlayerData.getData(p).setInScoreboardEdit(false);
+            PlayerData.getData(p).setInLobbyScoreboardEdit(false);
+            PlayerData.getData(p).setInGameScoreboardEdit(false);
             PlayerData.getData(p).setInEdit(false);
             p.resetTitle();
         }
     }
 
-    public void compareAction(Player p, @NotNull ClickType c, int slot) {
+    public void compareAction(Player p, ScoreboardPage page, @NotNull ClickType c, int slot) {
         int line;
         if (slot < 18) {
             line = slot - 10;
@@ -70,7 +88,12 @@ public class LobbyScoreboardListener extends LobbyScoreboard implements Listener
             if (EditorUtil.isEditing(p)) {
                 return;
             }
-            PlayerData.getData(p).setInScoreboardEdit(true);
+            if (page.equals(ScoreboardPage.LOBBY)) {
+                PlayerData.getData(p).setInLobbyScoreboardEdit(true);
+            }
+            else if (page.equals(ScoreboardPage.GAME)) {
+                PlayerData.getData(p).setInGameScoreboardEdit(true);
+            }
             PlayerData.getData(p).setEditingScoreboardId(line);
             PlayerData.getData(p).setInEdit(true);
             p.closeInventory();
@@ -78,19 +101,19 @@ public class LobbyScoreboardListener extends LobbyScoreboard implements Listener
             p.sendMessage("§a" + line + "§e번째 스코어보드 내용 편집 중, 채팅창에 변경할 내용을 입력하세요. §8(색깔 코드 사용 가능)");
         }
         else if (c.equals(ClickType.LEFT)) {
-            editLine(lineEditType.UP, p, line);
+            editLine(page, lineEditType.UP, p, line);
         }
         else if (c.equals(ClickType.RIGHT)) {
-            editLine(lineEditType.DOWN, p, line);
+            editLine(page, lineEditType.DOWN, p, line);
         }
         else if (c.equals(ClickType.DROP)) {
-            config.set(DEFAULTPATH + line, null);
-            reloadMap();
-            open(p);
+            page.getConfig().set(DEFAULTPATH + line, null);
+            reloadMap(page);
+            open(p, page);
         }
     }
 
-    private void editLine(lineEditType editType, Player p, int line) {
+    private void editLine(ScoreboardPage page, lineEditType editType, Player p, int line) {
         if (editType == lineEditType.UP && line == 15) {
             Messager.sendErrorMessage(p, "이미 가장 높은 줄입니다.");
             return;
@@ -100,28 +123,28 @@ public class LobbyScoreboardListener extends LobbyScoreboard implements Listener
             return;
         }
         int lineAdditive = editType.additive;
-        config.set(DEFAULTPATH + (line + lineAdditive), scoreBoard.get(line));
-        if (scoreBoard.get(line + lineAdditive) == null) {
-            config.set(DEFAULTPATH + line, getBlank());
+        page.getConfig().set(DEFAULTPATH + (line + lineAdditive), getScoreboard(page).get(line));
+        if (getScoreboard(page).get(line + lineAdditive) == null) {
+            page.getConfig().set(DEFAULTPATH + line, getBlank(page));
         } else {
-            config.set(DEFAULTPATH + line, scoreBoard.get(line + lineAdditive));
+            page.getConfig().set(DEFAULTPATH + line, getScoreboard(page).get(line + lineAdditive));
         }
-        reloadMap();
-        open(p);
+        reloadMap(page);
+        open(p, page);
     }
 
-    private void setLine(int i, String s) {
+    private void setLine(ScoreboardPage page, int i, String s) {
         if (isBlank(s)) {
-            s = getBlank();
+            s = getBlank(page);
         }
-        config.set(DEFAULTPATH + i, s);
-        reloadMap();
+        page.getConfig().set(DEFAULTPATH + i, s);
+        reloadMap(page);
     }
 
-    private void newLine(Player p) {
+    private void newLine(Player p, ScoreboardPage page) {
         int line = -1;
         for (int i = 0; i < 22; i++) {
-            if (scoreBoard.get(i) == null) {
+            if (getScoreboard(page).get(i) == null) {
                 line = i;
                 break;
             }
@@ -131,18 +154,23 @@ public class LobbyScoreboardListener extends LobbyScoreboard implements Listener
             }
         }
         if (line >= 0) {
-            config.set(DEFAULTPATH + line, getBlank());
-            reloadMap();
+            page.getConfig().set(DEFAULTPATH + line, getBlank(page));
+            reloadMap(page);
         }
-        open(p);
+        open(p, page);
     }
 
-    private @NotNull String getBlank() {
+    private static @NotNull String getBlank(ScoreboardPage page) {
         StringBuilder s = new StringBuilder(" ");
-        for (int i = 0; i < blankCount; i++) {
+        for (int i = 0; i < getBlankCount(page); i++) {
             s.append(" ");
         }
-        blankCount++;
+        if (page.equals(ScoreboardPage.LOBBY)) {
+            lobbyBlankCount++;
+        }
+        else if (page.equals(ScoreboardPage.GAME)) {
+            gameBlankCount++;
+        }
         return s.toString();
     }
 }

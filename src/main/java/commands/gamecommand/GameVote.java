@@ -5,6 +5,7 @@ import daybreak.abilitywar.game.GameManager;
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.playerdata.PlayerData;
 import main.java.util.AddonConfig;
+import main.java.util.ItemColor;
 import main.java.util.ItemFactory;
 import main.java.util.SoundUtil;
 import org.bukkit.Bukkit;
@@ -36,7 +37,7 @@ public class GameVote extends Command {
             this.desc = desc;
         }
     }
-    protected AddonConfig config;
+    protected final AddonConfig config;
     protected static final int INV_SIZE = 54;
     protected static final String DEFAULTPATH = "vote.";
     protected static final String ENABLED = DEFAULTPATH + "enabled";
@@ -56,7 +57,6 @@ public class GameVote extends Command {
     protected boolean onCommand(CommandSender sender, String command, String[] args) {
         if (sender instanceof Player) {
             open((Player) sender);
-            return true;
         }
         Messager.sendErrorMessage(sender, "이 명령어는 플레이어만 사용할 수 있습니다.");
         return true;
@@ -74,7 +74,7 @@ public class GameVote extends Command {
     protected void open(Player p) {
         Inventory gui = Bukkit.createInventory(null, INV_SIZE, INV_TITLE);
         for (int i = 0; i < gui.getSize(); i++) {
-            gui.setItem(i, ItemFactory.blank(ItemFactory.ItemColor.LIGHT_BLUE, false));
+            gui.setItem(i, ItemFactory.blank(ItemColor.LIGHT_BLUE, false));
         }
         String s = "§a선택됨!";
         String c = "§e클릭해서 선택하기";
@@ -157,6 +157,7 @@ public class GameVote extends Command {
             Bukkit.broadcastMessage("§e" + p.getName() + "§f님이 게임 시작에 §b투표했습니다§f. §b(§9" + voteCount + VOTE_SLASH + requiredVote + "§b)");
             Bukkit.getOnlinePlayers().forEach(s -> SoundUtil.playChord(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1));
             if (voteCount == requiredVote) {
+                Bukkit.broadcastMessage("§b> §a게임 시작 투표 인원이 충족되었습니다. 게임을 시작합니다.");
                 voteCount = 0;
                 Bukkit.getOnlinePlayers().forEach(s -> PlayerData.getData(s).setVoted(false));
                 voteBar.setVisible(false);

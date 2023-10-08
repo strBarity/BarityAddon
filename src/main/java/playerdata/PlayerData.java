@@ -9,7 +9,8 @@ public class PlayerData {
 
     private boolean isVoted;
     private boolean inEdit;
-    private boolean inScoreboardEdit;
+    private boolean inLobbyScoreboardEdit;
+    private boolean inGameScoreboardEdit;
     private int editingScoreboardId;
     private boolean inChatFormatEdit;
     private boolean inTablistHeaderEdit;
@@ -20,7 +21,8 @@ public class PlayerData {
 
     public PlayerData(boolean isVoted,
                       boolean inEdit,
-                      boolean inScoreboardEdit,
+                      boolean inLobbyScoreboardEdit,
+                      boolean inGameScoreboardEdit,
                       int editingScoreboardId,
                       boolean inChatFormatEdit,
                       boolean inTablistHeaderEdit,
@@ -28,7 +30,8 @@ public class PlayerData {
                       boolean inTablistPlayerFormatEdit) {
         this.isVoted = isVoted;
         this.inEdit = inEdit;
-        this.inScoreboardEdit = inScoreboardEdit;
+        this.inLobbyScoreboardEdit = inLobbyScoreboardEdit;
+        this.inGameScoreboardEdit = inGameScoreboardEdit;
         this.editingScoreboardId = editingScoreboardId;
         this.inChatFormatEdit = inChatFormatEdit;
         this.inTablistHeaderEdit = inTablistHeaderEdit;
@@ -44,12 +47,12 @@ public class PlayerData {
         isVoted = voted;
     }
 
-    public boolean isInScoreboardEdit() {
-        return inScoreboardEdit;
+    public boolean isInLobbyScoreboardEdit() {
+        return inLobbyScoreboardEdit;
     }
 
-    public void setInScoreboardEdit(boolean inScoreboardEdit) {
-        this.inScoreboardEdit = inScoreboardEdit;
+    public void setInLobbyScoreboardEdit(boolean inLobbyScoreboardEdit) {
+        this.inLobbyScoreboardEdit = inLobbyScoreboardEdit;
     }
 
     public int getEditingScoreboardId() {
@@ -100,12 +103,19 @@ public class PlayerData {
         this.inEdit = inEdit;
     }
 
+    public boolean isInGameScoreboardEdit() {
+        return inGameScoreboardEdit;
+    }
+
+    public void setInGameScoreboardEdit(boolean inGameScoreboardEdit) {
+        this.inGameScoreboardEdit = inGameScoreboardEdit;
+    }
+
     public static void defineData(Player p) {
         if (DATA.containsKey(p)) {
             throw new PlayerDataAlreadyExistsException("플레이어 " + p.getName() + "의 데이터는 이미 존재합니다");
         }
-
-        DATA.put(p, new PlayerData(false, false, false, 0, false, false, false, false));
+        DATA.put(p, new PlayerData(false, false, false, false,0, false, false, false, false));
     }
 
 

@@ -3,6 +3,7 @@ package main.java.commands.lobby;
 import daybreak.abilitywar.Command;
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.util.AddonConfig;
+import main.java.util.ItemColor;
 import main.java.util.ItemFactory;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerListHeaderFooter;
@@ -19,7 +20,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 
 public class LobbyTablist extends Command {
-    protected AddonConfig config;
+    protected final AddonConfig config;
     protected static final int INV_SIZE = 36;
     protected static final String DEFAULTPATH = "tablist.";
     protected static final String HEADER = DEFAULTPATH + "header";
@@ -49,7 +50,7 @@ public class LobbyTablist extends Command {
         String s = "§e클릭해서 설정하기";
         String c = "§f현재 설정: ";
         for (int i = 0; i < INV_SIZE; i++) {
-            gui.setItem(i, ItemFactory.blank(ItemFactory.ItemColor.MAGENTA, true));
+            gui.setItem(i, ItemFactory.blank(ItemColor.MAGENTA, true));
         }
         String header = ChatColor.translateAlternateColorCodes('&', config.get(HEADER).toString());
         String footer = ChatColor.translateAlternateColorCodes('&', config.get(FOOTER).toString());

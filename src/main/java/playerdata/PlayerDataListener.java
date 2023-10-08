@@ -1,5 +1,7 @@
 package main.java.playerdata;
 
+import daybreak.abilitywar.AbilityWar;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -15,6 +17,6 @@ public class PlayerDataListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(@NotNull PlayerQuitEvent e) {
-        PlayerData.clearData(e.getPlayer());
+        Bukkit.getScheduler().scheduleSyncDelayedTask(AbilityWar.getPlugin(), () -> PlayerData.clearData(e.getPlayer()), 1);
     }
 }

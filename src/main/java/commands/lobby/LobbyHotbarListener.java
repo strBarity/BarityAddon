@@ -1,5 +1,8 @@
 package main.java.commands.lobby;
 
+import daybreak.abilitywar.AbilityWar;
+import daybreak.abilitywar.game.event.GameEndEvent;
+import daybreak.abilitywar.game.event.GameReadyEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,6 +15,22 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class LobbyHotbarListener extends LobbyHotbar implements Listener {
+    @EventHandler
+    public void onGameStart(GameReadyEvent e) {
+        if (isHotbarExists()) {
+            for (Player pl : Bukkit.getOnlinePlayers()) {
+                for (int i = 0; i < 9; i++) {
+                    pl.getInventory().setItem(i, new ItemStack(Material.AIR));
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onGameEnd(GameEndEvent e) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(AbilityWar.getPlugin(), () -> Bukkit.getOnlinePlayers().forEach(this::updateHotbar), 201);
+    }
+
     @EventHandler
     public void onInventoryClick(@NotNull InventoryClickEvent e) {
         if (e.getView().getTitle().equals(INV_TITLE)) {
@@ -28,7 +47,7 @@ public class LobbyHotbarListener extends LobbyHotbar implements Listener {
     public void onInventoryClose(@NotNull InventoryCloseEvent e) {
         if (e.getView().getTitle().equals(INV_TITLE)) {
             for (int i = 0; i < 9; i++) {
-                config.set(DEFAULTPATH + i, e.getInventory().getItem(i +  18));
+                config.set(DEFAULTPATH + i, e.getInventory().getItem(i + 18));
             }
             Bukkit.getOnlinePlayers().forEach(this::updateHotbar);
         }
@@ -46,8 +65,7 @@ public class LobbyHotbarListener extends LobbyHotbar implements Listener {
                 ItemStack item = config.getConfig().getItemStack(DEFAULTPATH + i);
                 if (item != null) {
                     p.getInventory().setItem(i, item);
-                }
-                else {
+                } else {
                     p.getInventory().setItem(i, new ItemStack(Material.AIR));
                 }
             }
@@ -60,8 +78,7 @@ public class LobbyHotbarListener extends LobbyHotbar implements Listener {
                 if (i == e.getSlot() - 18) {
                     if (e.getCursor() == null || e.getCursor().getType().equals(Material.AIR)) {
                         config.set(DEFAULTPATH + (e.getSlot() - 18), null);
-                    }
-                    else {
+                    } else {
                         config.set(DEFAULTPATH + (e.getSlot() - 18), e.getCursor());
                     }
                 } else {

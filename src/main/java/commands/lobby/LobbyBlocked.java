@@ -4,6 +4,7 @@ import daybreak.abilitywar.AbilityWar;
 import daybreak.abilitywar.Command;
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.util.AddonConfig;
+import main.java.util.ItemColor;
 import main.java.util.ItemFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -14,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class LobbyBlocked extends Command {
@@ -39,7 +39,7 @@ public class LobbyBlocked extends Command {
             this.lore.addAll(lore);
         }
     }
-    protected AddonConfig config;
+    protected final AddonConfig config;
     protected static final String DEFAULTPATH = "blockedActions.";
     protected static final int INV_SIZE = 45;
     protected static final String INV_TITLE = "§8게임 시작 전 금지 행동 설정";
@@ -66,9 +66,9 @@ public class LobbyBlocked extends Command {
     protected void open(Player p) {
         Inventory gui = Bukkit.createInventory(null, INV_SIZE, INV_TITLE);
         for (int i = 0; i < gui.getSize(); i++) {
-            gui.setItem(i, ItemFactory.blank(ItemFactory.ItemColor.WHITE, false));
+            gui.setItem(i, ItemFactory.blank(ItemColor.WHITE, false));
         }
-        gui.setItem(3, ItemFactory.createItem(Material.SIGN, 0, "§c금지 행동 설정", Collections.singletonList("§7게임 시작 전, 플레이어들이 금지할 설정을 설정합니다."), null, 1, true));
+        gui.setItem(3, ItemFactory.createItem(Material.SIGN, 0, "§c금지 행동 설정", Arrays.asList("§7게임 시작 전, 플레이어들이 금지할 설정을 설정합니다.", "§c설정된 금지 행동은 능력 배정이 끝난 후 무적 시간 시작 직전까지 적용됩니다."), null, 1, true));
         applyConfig(gui);
         p.openInventory(gui);
     }

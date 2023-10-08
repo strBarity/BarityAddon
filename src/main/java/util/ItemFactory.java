@@ -19,29 +19,6 @@ public class ItemFactory {
 
     }
 
-    public enum ItemColor {
-        WHITE(0),
-        ORANGE(1),
-        MAGENTA(2),
-        LIGHT_BLUE(3),
-        YELLOW(4),
-        LIME(5),
-        PINK(6),
-        GRAY(7),
-        LIGHT_GRAY(8),
-        CYAN(9),
-        PURPLE(10),
-        BLUE(11),
-        BROWN(12),
-        GREEN(13),
-        RED(14),
-        BLACK(15);
-        private final int color;
-        ItemColor(int color) {
-            this.color = color;
-        }
-    }
-
     public static @NotNull ItemStack createItem(Material type, int damage, String name, @Nullable List<String> lore, @Nullable Map<Enchantment, Integer> enchant, int amount, boolean isShiny) {
         ItemStack i = new ItemStack(type, amount, (short) damage);
         ItemMeta m = i.getItemMeta();
