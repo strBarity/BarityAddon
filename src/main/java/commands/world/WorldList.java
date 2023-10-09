@@ -13,6 +13,7 @@ import java.util.List;
 public class WorldList extends Command {
     private final AddonConfig config;
     public WorldList() {
+        super(Condition.OP);
         config = AddonConfig.getConfig("worldConfig");
     }
     @Override

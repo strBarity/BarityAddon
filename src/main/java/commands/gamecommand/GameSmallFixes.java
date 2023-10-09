@@ -3,9 +3,9 @@ package main.java.commands.gamecommand;
 import daybreak.abilitywar.Command;
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.util.AddonConfig;
+import main.java.util.InventoryUtil;
 import main.java.util.ItemColor;
 import main.java.util.ItemFactory;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -21,6 +21,7 @@ public class GameSmallFixes extends Command {
     protected static final String DEFAULTPATH = "smallfixes.";
     protected static final String AUTO_CHECK_WHEN_SET = DEFAULTPATH + "autoCheckWhenSet";
     public GameSmallFixes() {
+        super(Condition.OP);
         config = AddonConfig.getConfig("gameConfig");
         resetConfig();
     }
@@ -35,10 +36,7 @@ public class GameSmallFixes extends Command {
         return true;
     }
     protected void open(Player p) {
-        Inventory gui = Bukkit.createInventory(null, INV_SIZE, INV_TITLE);
-        for (int i = 0; i < gui.getSize(); i++) {
-            gui.setItem(i, ItemFactory.blank(ItemColor.MAGENTA, false));
-        }
+        Inventory gui = InventoryUtil.blankInv(INV_SIZE, INV_TITLE, ItemColor.MAGENTA, false);
         applyConfig(gui);
         p.openInventory(gui);
     }

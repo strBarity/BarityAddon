@@ -2,6 +2,7 @@ package main.java.commands;
 
 import daybreak.abilitywar.AbilityWar;
 import daybreak.abilitywar.game.GameManager;
+import main.java.util.InventoryUtil;
 import main.java.util.ItemColor;
 import main.java.util.ItemFactory;
 import org.bukkit.Bukkit;
@@ -50,16 +51,7 @@ public class ScoreboardHandler {
     }
     public static void open(Player p, @NotNull ScoreboardPage page) {
         Map<Integer, String> scoreBoard = getScoreboard(page);
-        Inventory gui = Bukkit.createInventory(null, 54, page.getInvTitle());
-        for (int i = 0; i < 9; i++) {
-            gui.setItem(i, ItemFactory.blank(ItemColor.WHITE, true));
-        }
-        for (int i = 36; i < gui.getSize(); i++) {
-            gui.setItem(i, ItemFactory.blank(ItemColor.WHITE, true));
-        }
-        for (int i : new ArrayList<>(Arrays.asList(9, 17, 18, 26, 27, 35))) {
-            gui.setItem(i, ItemFactory.blank(ItemColor.WHITE, true));
-        }
+        Inventory gui = InventoryUtil.blankInvFullBorder(54, page.getInvTitle(), ItemColor.WHITE, true, ItemColor.WHITE, true);
         for (int i = 30; i < 35; i++) {
             gui.setItem(i, ItemFactory.createItem(Material.WOOL, 14, " ", null, null, 1, false));
         }
@@ -80,17 +72,7 @@ public class ScoreboardHandler {
             lore.add("§c좌클릭     》 §e줄 한 칸 올리기");
             lore.add("§c우클릭     》 §e줄 한 칸 내리기");
             lore.add("§cQ     》 §4제거 ");
-            int slot;
-            if (i < 7) {
-                slot = i + 10;
-            }
-            else if (i < 14) {
-                slot = i + 12;
-            }
-            else {
-                slot = i + 14;
-            }
-            gui.setItem(slot, ItemFactory.createItem(Material.SIGN, 0, "§f" + i + "번째 줄", lore, null, 1, false));
+            gui.setItem(InventoryUtil.getFullBorderedInvSlot(i), ItemFactory.createItem(Material.SIGN, 0, "§f" + i + "번째 줄", lore, null, 1, false));
         }
         p.openInventory(gui);
     }

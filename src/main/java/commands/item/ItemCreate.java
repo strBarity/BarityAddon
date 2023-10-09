@@ -16,7 +16,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class ItemCrate extends Command {
+public class ItemCreate extends Command {
+    public ItemCreate() {
+        super(Condition.OP);
+    }
     @Override
     protected boolean onCommand(CommandSender sender, String command, String @NotNull [] args) {
         if (sender instanceof Player) {

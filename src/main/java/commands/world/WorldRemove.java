@@ -13,6 +13,7 @@ public class WorldRemove extends Command {
     private final AddonConfig config;
     private static final String GAMEWORLDS = "gameWorlds";
     public WorldRemove() {
+        super(Condition.OP);
         config = AddonConfig.getConfig("worldConfig");
     }
     @Override

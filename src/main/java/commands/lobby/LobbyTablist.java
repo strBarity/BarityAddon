@@ -3,6 +3,7 @@ package main.java.commands.lobby;
 import daybreak.abilitywar.Command;
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.util.AddonConfig;
+import main.java.util.InventoryUtil;
 import main.java.util.ItemColor;
 import main.java.util.ItemFactory;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
@@ -46,12 +47,9 @@ public class LobbyTablist extends Command {
     }
 
     protected void open(Player p) {
-        Inventory gui = Bukkit.createInventory(null, INV_SIZE, INV_TITLE);
+        Inventory gui = InventoryUtil.blankInv(INV_SIZE, INV_TITLE, ItemColor.MAGENTA, true);
         String s = "§e클릭해서 설정하기";
         String c = "§f현재 설정: ";
-        for (int i = 0; i < INV_SIZE; i++) {
-            gui.setItem(i, ItemFactory.blank(ItemColor.MAGENTA, true));
-        }
         String header = ChatColor.translateAlternateColorCodes('&', config.get(HEADER).toString());
         String footer = ChatColor.translateAlternateColorCodes('&', config.get(FOOTER).toString());
         if (header.isEmpty()) {

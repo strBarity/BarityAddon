@@ -4,10 +4,7 @@ import daybreak.abilitywar.Command;
 import daybreak.abilitywar.game.GameManager;
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.playerdata.PlayerData;
-import main.java.util.AddonConfig;
-import main.java.util.ItemColor;
-import main.java.util.ItemFactory;
-import main.java.util.SoundUtil;
+import main.java.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -72,10 +69,7 @@ public class GameVote extends Command {
     }
 
     protected void open(Player p) {
-        Inventory gui = Bukkit.createInventory(null, INV_SIZE, INV_TITLE);
-        for (int i = 0; i < gui.getSize(); i++) {
-            gui.setItem(i, ItemFactory.blank(ItemColor.LIGHT_BLUE, false));
-        }
+        Inventory gui = InventoryUtil.blankInv(INV_SIZE, INV_TITLE, ItemColor.LIGHT_BLUE, false);
         String s = "§a선택됨!";
         String c = "§e클릭해서 선택하기";
         String allS = c;

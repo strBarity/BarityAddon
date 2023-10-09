@@ -10,6 +10,7 @@ public class WorldMain extends Command {
     private final AddonConfig config;
     private static final String GAMEWORLDNAME = "gameWorldName";
     public WorldMain() {
+        super(Condition.OP);
         config = AddonConfig.getConfig("worldConfig");
         if (config.get(GAMEWORLDNAME) == null) {
             config.set(GAMEWORLDNAME, "main");

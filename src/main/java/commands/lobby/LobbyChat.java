@@ -3,14 +3,15 @@ package main.java.commands.lobby;
 import daybreak.abilitywar.Command;
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.util.AddonConfig;
+import main.java.util.InventoryUtil;
 import main.java.util.ItemColor;
 import main.java.util.ItemFactory;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -34,11 +35,8 @@ public class LobbyChat extends Command {
         }
         return true;
     }
-    protected void open(Player p) {
-        Inventory gui = Bukkit.createInventory(null, INV_SIZE, INV_TITLE);
-        for (int i = 0; i < INV_SIZE; i++) {
-            gui.setItem(i, ItemFactory.blank(ItemColor.YELLOW, true));
-        }
+    protected void open(@NotNull Player p) {
+        Inventory gui = InventoryUtil.blankInv(INV_SIZE, INV_TITLE, ItemColor.YELLOW, true);
         gui.setItem(13, ItemFactory.createItem(Material.SIGN, 0, "§a채팅 포맷 설정", Arrays.asList("§f현재 포맷: " + ChatColor.translateAlternateColorCodes('&', config.get(CHAT_FORMAT).toString()), "", "§e클릭해서 변경하기"), null, 1, true));
         gui.setItem(31, ItemFactory.createItem(Material.BOOK, 0, "§a사용 가능한 변수 목록", Arrays.asList("§e- $name §8: §b플레이어 이름 §c(필수)", "§e- $msg §8: §b메시지 §c(필수)"), null, 1, false));
         p.openInventory(gui);

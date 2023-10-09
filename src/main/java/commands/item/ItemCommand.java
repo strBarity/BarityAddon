@@ -33,7 +33,7 @@ public class ItemCommand {
                 }
             }
         };
-        itemCommand.addSubCommand("create", new ItemCrate());
+        itemCommand.addSubCommand("create", new ItemCreate());
         itemCommand.addSubCommand("storage", new ItemStorage());
         AbilityWar.getPlugin().getCommands().getMainCommand().addSubCommand("item", itemCommand);
     }

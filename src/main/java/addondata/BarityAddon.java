@@ -4,10 +4,7 @@ import daybreak.abilitywar.addon.Addon;
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.commands.BarityCommand;
 import main.java.commands.ScoreboardListener;
-import main.java.commands.gamecommand.GameScoreboard;
-import main.java.commands.gamecommand.GameSmallFixesListener;
-import main.java.commands.gamecommand.GameVote;
-import main.java.commands.gamecommand.GameVoteListener;
+import main.java.commands.gamecommand.*;
 import main.java.commands.item.ItemStorageListener;
 import main.java.commands.lobby.*;
 import main.java.commands.world.WorldListener;
@@ -42,7 +39,8 @@ public class BarityAddon extends Addon {
                 new LobbyTablistListener(),
                 new WorldListener(),
                 new GameSmallFixesListener(),
-                new ScoreboardListener());
+                new ScoreboardListener(),
+                new GameCustomGUIListener());
 
         AddonConfig.getConfig("itemStorage").loadData();
         AddonConfig.getConfig("lobbyConfig").loadData();

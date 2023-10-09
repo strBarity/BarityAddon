@@ -3,9 +3,9 @@ package main.java.commands.lobby;
 import daybreak.abilitywar.Command;
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.util.AddonConfig;
+import main.java.util.InventoryUtil;
 import main.java.util.ItemColor;
 import main.java.util.ItemFactory;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -38,10 +38,7 @@ public class LobbyHotbar extends Command {
     }
 
     protected void open(Player p) {
-        Inventory gui = Bukkit.createInventory(null, INV_SIZE, INV_TITLE);
-        for (int i = 0; i < gui.getSize(); i++) {
-            gui.setItem(i, ItemFactory.blank(ItemColor.LIGHT_BLUE, false));
-        }
+        Inventory gui = InventoryUtil.blankInv(INV_SIZE, INV_TITLE, ItemColor.LIGHT_BLUE, false);
         gui.setItem(4, hotbarSign);
         applyConfig(gui);
         p.openInventory(gui);

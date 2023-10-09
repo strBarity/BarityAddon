@@ -4,6 +4,7 @@ import daybreak.abilitywar.AbilityWar;
 import daybreak.abilitywar.Command;
 import daybreak.abilitywar.utils.base.Messager;
 import main.java.util.AddonConfig;
+import main.java.util.InventoryUtil;
 import main.java.util.ItemColor;
 import main.java.util.ItemFactory;
 import org.bukkit.Bukkit;
@@ -63,11 +64,8 @@ public class LobbyBlocked extends Command {
         return true;
     }
 
-    protected void open(Player p) {
-        Inventory gui = Bukkit.createInventory(null, INV_SIZE, INV_TITLE);
-        for (int i = 0; i < gui.getSize(); i++) {
-            gui.setItem(i, ItemFactory.blank(ItemColor.WHITE, false));
-        }
+    protected void open(@NotNull Player p) {
+        Inventory gui = InventoryUtil.blankInv(INV_SIZE, INV_TITLE, ItemColor.WHITE, false);
         gui.setItem(3, ItemFactory.createItem(Material.SIGN, 0, "§c금지 행동 설정", Arrays.asList("§7게임 시작 전, 플레이어들이 금지할 설정을 설정합니다.", "§c설정된 금지 행동은 능력 배정이 끝난 후 무적 시간 시작 직전까지 적용됩니다."), null, 1, true));
         applyConfig(gui);
         p.openInventory(gui);

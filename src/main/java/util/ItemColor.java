@@ -1,5 +1,6 @@
 package main.java.util;
 
+@SuppressWarnings("unused")
 public enum ItemColor {
     WHITE(0),
     ORANGE(1),
