@@ -42,18 +42,22 @@ public enum GUIEnchant {
     private final String displayName;
     private final GUIEnchantSlot slot;
     private final String description;
-    private GUIEnchantBundle bundle;
-    private Enchantment[] conflicts = new Enchantment[]{};
+    private final GUIEnchantBundle bundle;
+    private final Enchantment[] conflicts;
     private final int maxLevel;
     private static final AddonConfig config = AddonConfig.getConfig("gameConfig");
     private static final String DEFAULTPATH = "gui.customEnchantingTable.enchants.";
     private static final String CHANCE = ".chance";
+    private static final String TOTAL_CHANCE = ".totalChance";
     private static final String WEIGHT = ".weight";
     private static final String TOTAL_WEIGHT = ".totalWeight";
     private static final String LEVEL_CHANCE = ".levelChance.";
     private static final String SLOT_WEIGHTS = ".slotWeights.";
     public boolean isChanceNotDefined() {
         return config.get(DEFAULTPATH + this.name() + CHANCE) == null;
+    }
+    public boolean isTotalChanceNotDefined() {
+        return config.get(DEFAULTPATH + this.name() + TOTAL_CHANCE) == null;
     }
     public boolean isWeightNotDefined() {
         return config.get(DEFAULTPATH + this.name() + WEIGHT) == null;
@@ -72,6 +76,9 @@ public enum GUIEnchant {
     public double getChance() {
         return Double.parseDouble(config.get(DEFAULTPATH + this.name() + CHANCE).toString());
     }
+    public double getTotalChance() {
+        return Double.parseDouble(config.get(DEFAULTPATH + this.name() + TOTAL_CHANCE).toString());
+    }
     public int getWeight() {
         return Integer.parseInt(config.get(DEFAULTPATH + this.name() + WEIGHT).toString());
     }
@@ -88,6 +95,9 @@ public enum GUIEnchant {
     }
     public void chance(double chance) {
         config.set(DEFAULTPATH + this.name() + CHANCE, chance);
+    }
+    public void totalChance(double totalChance) {
+        config.set(DEFAULTPATH + this.name() + TOTAL_CHANCE, totalChance);
     }
     public void weight(int weight) {
         config.set(DEFAULTPATH + this.name() + WEIGHT, weight);
@@ -150,6 +160,8 @@ public enum GUIEnchant {
     public static @NotNull List<GUIEnchant> getFromSlot(@NotNull GUIEnchantSlot slot) {
         switch (slot) {
             case ARMOR:
+            case BOOTS:
+            case HELMET:
                 return getArmorEnchants();
             case MELEE:
                 return getMeleeEnchants();
@@ -209,6 +221,8 @@ public enum GUIEnchant {
         this.slot = slot;
         this.description = description;
         this.maxLevel = maxLevel;
+        this.bundle = null;
+        this.conflicts = new Enchantment[]{};
     }
     GUIEnchant(Enchantment bukkitEnchant, String displayName, GUIEnchantSlot slot, String description, int maxLevel, GUIEnchantBundle bundle, Enchantment... conflicts) {
         this.bukkitEnchant = bukkitEnchant;

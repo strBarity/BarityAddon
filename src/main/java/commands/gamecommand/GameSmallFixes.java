@@ -35,7 +35,7 @@ public class GameSmallFixes extends Command {
         }
         return true;
     }
-    protected void open(Player p) {
+    protected void open(@NotNull Player p) {
         Inventory gui = InventoryUtil.blankInv(INV_SIZE, INV_TITLE, ItemColor.MAGENTA, false);
         applyConfig(gui);
         p.openInventory(gui);

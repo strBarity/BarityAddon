@@ -1,6 +1,6 @@
 package main.java.commands.gamecommand;
 
-import main.java.util.IntUtil;
+import main.java.util.MathUtil;
 import main.java.util.InventoryUtil;
 import main.java.util.ItemColor;
 import main.java.util.ItemFactory;
@@ -36,6 +36,7 @@ public class GameCustomGUIListener extends GameCustomGUI implements Listener {
     private static final String WEIGHT_LORE = "§a§l우선순위§f: ";
     private static final String CHANCE_LORE = "§e§l출현 확률§f: ";
     private static final String LIST_PREFIX = "§f - §d";
+    private static final List<String> enchantDefaultLore = Arrays.asList("", "§c좌클릭     》 §a우선순위 1 높이기", "§c우클릭     》 §a우선순위 1 낮추기", "§cSHIFT + 클릭     》 §a상세 확률 설정하기", "§cQ     》 §4제외하기 §8(출현 확률 0%로 설정하기)");
 
     @EventHandler
     public void onInventoryClick(@NotNull InventoryClickEvent e) {
@@ -119,8 +120,17 @@ public class GameCustomGUIListener extends GameCustomGUI implements Listener {
     private void openMenu(@NotNull Player p, @NotNull GUIEnchantSlot slot, ItemColor mainBlankColor, ItemColor borderColor) {
         Inventory gui = InventoryUtil.blankInvFullBorder(ENCHANT_EDIT_INV_SIZE, SECOND_INV_TITLE + slot.getDisplayName(), mainBlankColor, false, borderColor, true);
         gui.setItem(49, backToFirstPage);
+        getAmountChances(gui, slot);
         getEnchants(gui, slot);
         p.openInventory(gui);
+    }
+
+    private void getAmountChances(Inventory gui, @NotNull GUIEnchantSlot slot) {
+        List<String> lore = new ArrayList<>();
+        for (int i = 1; i <= slot.getEnchantsAmount(); i++) {
+            lore.add(LIST_PREFIX + i + "§f개: " + slot.getAmountChance(i) + "%");
+        }
+        gui.setItem(4, ItemFactory.createItem(Material.NAME_TAG, 0, "§a인챈트 갯수 확률§f: ", lore, null, 1, true));
     }
 
     private void getEnchants(Inventory gui, GUIEnchantSlot slot) {
@@ -146,29 +156,37 @@ public class GameCustomGUIListener extends GameCustomGUI implements Listener {
         }
     }
 
-    private void getNormalEnchant(Inventory gui, GUIEnchantSlot slot, @NotNull GUIEnchant enchant, boolean all) {
+    private void getNormalEnchant(Inventory gui, GUIEnchantSlot slot, @NotNull GUIEnchant enchant, boolean book) {
         int weight;
+        double chance;
         if (enchant.getSlot().equals(GUIEnchantSlot.ALL)) {
-            if (all) {
+            if (book) {
                 weight = Integer.parseInt(Integer.toString(enchant.getTotalWeight()));
             } else {
                 weight = Integer.parseInt(Integer.toString(enchant.getSlotWeight(slot)));
             }
         } else {
-            if (all) {
+            if (book) {
                 weight = Integer.parseInt(Integer.toString(enchant.getTotalWeight()));
             } else {
                 weight = Integer.parseInt(Integer.toString(enchant.getWeight()));
             }
         }
-        List<String> lore = new ArrayList<>(Arrays.asList(AVAILABLE_ITEMS + enchant.getSlot().getDisplayName(), "§7" + enchant.getDescription(), "", WEIGHT_LORE + weight, CHANCE_LORE + enchant.getChance() + "%"));
+        if (book) {
+            chance = enchant.getTotalChance();
+        }
+        else {
+            chance = enchant.getChance();
+        }
+        List<String> lore = new ArrayList<>(Arrays.asList(AVAILABLE_ITEMS + enchant.getSlot().getDisplayName(), "§7" + enchant.getDescription(), "", WEIGHT_LORE + weight, CHANCE_LORE + chance + "%"));
         if (enchant.getMaxLevel() != 1) {
             lore.add("");
             lore.add("§a인챈트 레벨 확률§f: ");
             for (int j = 1; j <= enchant.getMaxLevel(); j++) {
-                lore.add(LIST_PREFIX + j + "§5(" + IntUtil.integerToRoman(j) + "§5) §f: " + enchant.getLevelChance(j) + "%");
+                lore.add(LIST_PREFIX + j + "§5(" + MathUtil.integerToRoman(j) + "§5) §f: " + enchant.getLevelChance(j) + "%");
             }
         }
+        lore.addAll(enchantDefaultLore);
         gui.setItem(InventoryUtil.getFullBorderedInvSlot(weight - 1), ItemFactory.createItem(Material.ENCHANTED_BOOK, 0, "§d" + enchant.getDisplayName(), lore, null, 1, true));
     }
 
@@ -184,6 +202,7 @@ public class GameCustomGUIListener extends GameCustomGUI implements Listener {
             GUIEnchant e = GUIEnchant.getFromBukkitEnchantment(enchantment);
             lore.add(LIST_PREFIX + e.getDisplayName() + " §f: " + bundle.getEnchantChance(e) + "%");
         }
+        lore.addAll(enchantDefaultLore);
         gui.setItem(InventoryUtil.getFullBorderedInvSlot(weight - 1), ItemFactory.createItem(Material.ENCHANTED_BOOK, 0, bundle.getDisplayName(), lore, null, 1, true));
     }
 

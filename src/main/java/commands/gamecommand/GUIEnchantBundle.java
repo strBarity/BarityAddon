@@ -21,6 +21,9 @@ public enum GUIEnchantBundle {
     private static final String WEIGHT = ".weight";
     private static final String TOTAL_WEIGHT = ".totalWeight";
     private static final String CHANCES = ".chances.";
+    public static @NotNull List<GUIEnchantBundle> getFromSlot(GUIEnchantSlot slot) {
+        return Arrays.stream(GUIEnchantBundle.values()).filter(e -> e.getEnchants().stream().allMatch(ench -> GUIEnchant.getFromBukkitEnchantment(ench).getSlot().equals(slot))).collect(Collectors.toList());
+    }
     public boolean isChanceNotDefined() {
         return config.get(ENCHANT_BUNDLE_PATH + this.name() + CHANCE) == null;
     }

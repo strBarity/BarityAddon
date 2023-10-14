@@ -29,7 +29,7 @@ public class LobbyBlocked extends Command {
         EAT_FOOD(Material.COOKIE, "§5음식 섭취", Arrays.asList("§7음식을 먹는 행위를 금지합니다.", "§7장식용 아이템을 먹어서 없애지 못하게 합니다.")),
         HUNGER(Material.ROTTEN_FLESH, "§2허기", Arrays.asList("§7배고픔 게이지가 감소하지 않게 합니다.", "§7기다리다 배고파서 쓰러지는 플레이어를 방지합니다.")),
         INV_CLICK(Material.STICK, "§9인벤토리 클릭", Arrays.asList("§7인벤토리 아이템을 클릭하지 못하게 합니다.", "§e핫바를 설정했다면 이 설정도 키는게 좋습니다.")),
-        VOID(Material.BEDROCK, "§8공허", Arrays.asList("§7맵을 탈출해 공허로 무한히 떨어지는걸 방지합니다.", "§7y=0 미만으로 내려갈 시 스폰 약간 반대 방향으로 위로 튀어오른 후", "§7그대로 스폰 쪽으로 날아가게 합니다."));
+        VOID(Material.BEDROCK, "§8공허", Arrays.asList("§7맵을 탈출해 공허로 무한히 떨어지는걸 방지합니다.", "§7y=0 미만으로 내려갈 시 스폰 약간 반대 방향으로 위로 튀어오른 후", "§7그대로 스폰 쪽으로 날아가게 합니다.", "§6[WIP] 아직 완성되지 않은 기능입니다!"));
         private final Material icon;
         private final String name;
         private final List<String> lore;

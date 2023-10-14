@@ -3,10 +3,7 @@ package main.java.commands.gamecommand;
 import daybreak.abilitywar.AbilityWar;
 import daybreak.abilitywar.Command;
 import daybreak.abilitywar.utils.base.Messager;
-import main.java.util.AddonConfig;
-import main.java.util.InventoryUtil;
-import main.java.util.ItemColor;
-import main.java.util.ItemFactory;
+import main.java.util.*;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,6 +15,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -82,6 +80,20 @@ public class GameCustomGUI extends Command {
             config.set(IS_ENCHANTING_TABLE_COMMAND_ENABLED, false);
         }
         resetEnchantChanceConfig();
+        resetEnchantAmountConfig();
+    }
+
+    private void resetEnchantAmountConfig() {
+        List<GUIEnchantSlot> slots = new ArrayList<>(GUIEnchantSlot.getCommonSlots());
+        slots.add(GUIEnchantSlot.BOOK);
+        for (GUIEnchantSlot slot : slots) {
+            if (slot.isAmountChanceNotDefined()) {
+                int enchantsAmount = slot.getEnchantsAmount();
+                for (int i = 1; i <= enchantsAmount; i++) {
+                    slot.amountChance(i, MathUtil.roundAt((double) 100 / enchantsAmount, 2));
+                }
+            }
+        }
     }
 
     private void resetEnchantChanceConfig() {
@@ -104,7 +116,10 @@ public class GameCustomGUI extends Command {
 
     private void resetChance(@NotNull GUIEnchant enchant, int weight) {
         if (enchant.isChanceNotDefined()) {
-            enchant.chance(0);
+            enchant.chance(20);
+        }
+        if (enchant.isTotalChanceNotDefined()) {
+            enchant.totalChance(10);
         }
         if (enchant.isTotalWeightNotDefined()) {
             enchant.totalWeight(weight);
@@ -112,7 +127,7 @@ public class GameCustomGUI extends Command {
         if (enchant.getMaxLevel() != 1) {
             for (int i = 1; i <= enchant.getMaxLevel(); i++) {
                 if (enchant.isLevelChanceNotDefined(i)) {
-                    enchant.levelChance(i, 0);
+                    enchant.levelChance(i, MathUtil.roundAt((double) 100 / enchant.getMaxLevel(), 2));
                 }
             }
         }
@@ -121,7 +136,7 @@ public class GameCustomGUI extends Command {
     private void resetEnchantBundleChances() {
         for (GUIEnchantBundle bundle : GUIEnchantBundle.values()) {
             if (bundle.isChanceNotDefined()) {
-                bundle.chance(0);
+                bundle.chance(20);
             }
             if (bundle.isWeightNotDefined()) {
                 bundle.weight(GUIEnchant.getFromBukkitEnchantment(bundle.getEnchants().get(0)).getWeight());
@@ -132,7 +147,7 @@ public class GameCustomGUI extends Command {
             for (Enchantment enchant : bundle.getEnchants()) {
                 GUIEnchant e = GUIEnchant.getFromBukkitEnchantment(enchant);
                 if (bundle.isEnchantChanceNotDefined(e)) {
-                    bundle.enchantChance(e, 0);
+                    bundle.enchantChance(e, MathUtil.roundAt((double) 100 / bundle.getEnchants().size(), 2));
                 }
             }
         }

@@ -60,8 +60,8 @@ public class LobbyTablist extends Command {
         }
         gui.setItem(11, ItemFactory.createItem(Material.IRON_HELMET, 0, "§b목록 상단 설정", Arrays.asList("§a플레이어 목록 상단의 텍스트를 설정합니다.", c + header, "", s), null, 1, false));
         gui.setItem(13, ItemFactory.createItem(Material.SKULL_ITEM, 0, "§b플레이어 이름 포맷 설정", Arrays.asList("§a플레이어 목록에 뜨는 플레이어들의 이름 포맷을 설정합니다.", c + ChatColor.translateAlternateColorCodes('&', config.get(PLAYER).toString()), "", s), null, 1, false));
-        gui.setItem(15, ItemFactory.createItem(Material.IRON_BOOTS, 0, "§b목록 상단 설정", Arrays.asList("§a플레이어 목록 하단의 텍스트를 설정합니다.", c + footer, "", s), null, 1, false));
-        gui.setItem(22, ItemFactory.createItem(Material.BOOK, 0, "§b사용 가능한 변수 목록", Arrays.asList("§e- $name §8: §b플레이어 이름 §c(필수)", "§e - $emblem §8: §b플레이어 엠블럼"), null, 1, false));
+        gui.setItem(15, ItemFactory.createItem(Material.IRON_BOOTS, 0, "§b목록 하단 설정", Arrays.asList("§a플레이어 목록 하단의 텍스트를 설정합니다.", c + footer, "", s), null, 1, false));
+        gui.setItem(22, ItemFactory.createItem(Material.BOOK, 0, "§b사용 가능한 변수 목록", Arrays.asList("§e- §d\\n §8: §b줄바꿈","§e- $name §8: §b플레이어 이름 §c(필수)", "§e - $emblem §8: §b플레이어 엠블럼"), null, 1, false));
         p.openInventory(gui);
     }
 

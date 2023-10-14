@@ -2,8 +2,8 @@ package main.java.util;
 
 import org.jetbrains.annotations.NotNull;
 
-public class IntUtil {
-    private IntUtil() {
+public class MathUtil {
+    private MathUtil() {
 
     }
 
@@ -18,5 +18,10 @@ public class IntUtil {
             }
         }
         return s.toString();
+    }
+
+    public static double roundAt(double value, int digit) {
+        double digitValue = Math.pow(10, digit);
+        return Math.round(value * digitValue) / digitValue;
     }
 }
